@@ -3,16 +3,38 @@
     <div class="flex w-full h-[10%] justify-center items-center bg-accent">
       <div class="text-base-100 text-4xl font-semibold">Tambah Data</div>
     </div>
+    <button class="btn btn-ghost text-neutral" @click="this.$router.push('/home')">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
+      </svg>
+      Kembali
+    </button>
     <div class="flex flex-col w-1/4 mx-auto mt-4">
-      <label class="text-xl">Nama: </label>
+      <label class="text-base">NIK: </label>
       <input
         type="text"
-        placeholder="Type here"
-        class="input input-bordered input-accent text-xl mb-4"
+        placeholder="Masukkan NIK"
+        class="input input-bordered input-accent input-sm text-base mb-4"
+        v-model="nik" />
+
+      <label class="text-base">Nama: </label>
+      <input
+        type="text"
+        placeholder="Masukkan Nama"
+        class="input input-bordered input-accent input-sm text-base mb-4"
         v-model="name" />
 
       <div class="flex flex-col mb-4">
-        <label class="text-xl mb-2">Jenis Kelamin: </label>
+        <label class="text-base mb-2">Jenis Kelamin: </label>
         <div class="flex items-center mb-2">
           <input
             type="radio"
@@ -34,154 +56,99 @@
         </div>
       </div>
 
-      <label class="text-xl">NIK: </label>
+      <label class="text-base">No. Handphone: </label>
       <input
         type="text"
-        placeholder="Type here"
-        class="input input-bordered input-accent text-xl mb-4"
-        v-model="nik" />
-
-      <label class="text-xl">No. Handphone: </label>
-      <input
-        type="text"
-        placeholder="Type here"
-        class="input input-bordered input-accent text-xl mb-4"
+        placeholder="Masukkan No. Handphone"
+        class="input input-bordered input-accent input-sm text-base mb-4"
         v-model="hp" />
 
-      <label class="text-xl">Provinsi: </label>
-      <select
+      <label class="text-base">Provinsi: </label>
+      <v-select
         v-model="provinsi"
-        class="select select-bordered select-accent text-xl mb-4"
-        @change="getCityData()">
-        <option disabled selected>Pilih Provinsi</option>
-        <option
-          v-for="prov in provinsiList"
-          :key="prov.id"
-          v-bind:value="{ name: prov.name, id: prov.id }">
-          {{ prov.name }}
-        </option>
-      </select>
+        :options="provinsiList"
+        label="name"
+        @update:modelValue="getCityData()">
+      </v-select>
 
       <div v-if="showKota">
-        <label class="text-xl">Kota/ Kabupaten: </label>
-        <select
+        <label class="text-base">Kota/ Kabupaten: </label>
+        <v-select
           v-model="kota"
-          class="select select-bordered select-accent text-xl mb-4 w-full"
-          @change="getDistrictData()">
-          <option disabled selected>Pilih Kota/ Kabupaten</option>
-          <option
-            v-for="city in kotaList"
-            :key="city.id"
-            v-bind:value="{ name: city.name, id: city.id }">
-            {{ city.name }}
-          </option>
-        </select>
+          :options="kotaList"
+          label="name"
+          @update:modelValue="getDistrictData()">
+        </v-select>
       </div>
 
       <div v-if="showKecamatan">
-        <label class="text-xl">Kecamatan: </label>
-        <select
+        <label class="text-base">Kecamatan: </label>
+        <v-select
           v-model="kecamatan"
-          class="select select-bordered select-accent text-xl mb-4 w-full"
-          @change="getVillageData()">
-          <option disabled selected>Pilih Kecamatan</option>
-          <option
-            v-for="kec in kecamatanList"
-            :key="kec.id"
-            v-bind:value="{ name: kec.name, id: kec.id }">
-            {{ kec.name }}
-          </option>
-        </select>
+          :options="kecamatanList"
+          label="name"
+          @update:modelValue="getVillageData()">
+        </v-select>
       </div>
 
       <div v-if="showKelurahan">
-        <label class="text-xl">Kelurahan: </label>
-        <select
+        <label class="text-base">Kelurahan: </label>
+        <v-select
           v-model="kelurahan"
-          class="select select-bordered select-accent text-xl mb-4 w-full"
-          @change="getPostalCodeData()">
-          <option disabled selected>Pilih Kelurahan</option>
-          <option
-            v-for="kel in kelurahanList"
-            :key="kel.id"
-            v-bind:value="{ name: kel.name, id: kel.id }">
-            {{ kel.name }}
-          </option>
-        </select>
+          :options="kelurahanList"
+          label="name"
+          @update:modelValue="getPostalCodeData()">
+        </v-select>
       </div>
 
       <div v-if="showPostalCode">
-        <label class="text-xl">Kode Pos: </label>
-        <select
-          v-model="kode_pos"
-          class="select select-bordered select-accent text-xl mb-4 w-full">
-          <option disabled selected>Pilih Kode Pos</option>
-          <option
-            v-for="pos in postalCodeFilter"
-            :key="pos.index"
-            v-bind:value="{ code: pos }">
-            {{ pos }}
-          </option>
-        </select>
+        <label class="text-base">Kode Pos: </label>
+        <v-select v-model="kode_pos" :options="postalCodeFilter" label="code">
+        </v-select>
       </div>
 
-      <label class="text-xl">Alamat: </label>
+      <label class="text-base">Alamat: </label>
       <textarea
-        class="textarea textarea-bordered textarea-accent text-xl mb-4 w-full"
-        placeholder="Alamat"
+        class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
+        placeholder="Masukkan alamat"
         v-model="alamat"></textarea>
 
       <div class="flex justify-between">
-        <div class="w-2/5">
-          <label class="text-xl">RT: </label>
+        <div class="flex flex-col w-2/5">
+          <label class="text-base">RT: </label>
           <input
             type="text"
-            placeholder="Type here"
-            class="input input-bordered input-accent text-xl mb-4 w-full"
+            placeholder="RT"
+            class="input input-bordered input-accent input-sm text-base mb-4"
             v-model="rt" />
         </div>
-        <div class="w-2/5">
-          <label class="text-xl">RW: </label>
+        <div class="flex flex-col w-2/5">
+          <label class="text-base">RW: </label>
           <input
             type="text"
-            placeholder="Type here"
-            class="input input-bordered input-accent text-xl mb-4 w-full"
+            placeholder="RW"
+            class="input input-bordered input-accent input-sm text-base mb-4"
             v-model="rw" />
         </div>
       </div>
 
-      <label class="text-xl">Caleg: </label>
-      <select
-        v-model="caleg"
-        class="select select-bordered select-accent text-xl mb-4 w-full">
-        <option disabled selected>Pilih Caleg</option>
-        <option
-          v-for="caleg in calegList"
-          :key="caleg.id"
-          v-bind:value="{ name: caleg.name }">
-          {{ caleg.name }}
-        </option>
-      </select>
+      <label class="text-base">Caleg: </label>
+      <v-select v-model="caleg" :options="calegList" label="name"> </v-select>
 
-      <div class="flex flex-col outline outline-accent p-2 mb-4">
-        <label class="text-xl">Kegiatan: </label>
-        <select
+      <div class="flex flex-col outline outline-accent p-2 my-4">
+        <label class="text-base">Kegiatan: </label>
+        <v-select
           v-model="event"
-          class="select select-bordered select-accent text-xl mb-4 w-full">
-          <option disabled selected>Pilih Kegiatan</option>
-          <option
-            v-for="event in evenList"
-            :key="event.id"
-            v-bind:value="{ id: event.id, name: event.name }">
-            {{ event.name }}
-          </option>
-        </select>
-        <label class="text-xl">Catatan Kegiatan: </label>
+          :options="evenList"
+          label="name"
+          @update:modelValue="getCityData()">
+        </v-select>
+        <label class="text-base">Catatan Kegiatan: </label>
         <textarea
-          class="textarea textarea-bordered textarea-accent text-xl mb-4 w-full"
+          class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
           placeholder="Catatan Kegiatan"
           v-model="catatan_kegiatan"></textarea>
-        <button class="btn btn-accent text-base-100" @click="tambahItem()">
+        <button class="btn btn-accent btn-sm text-base-100" @click="tambahItem()">
           Tambah
         </button>
         <table class="table">
@@ -200,9 +167,9 @@
         </table>
       </div>
 
-      <label class="text-xl">Catatan: </label>
+      <label class="text-base">Catatan: </label>
       <textarea
-        class="textarea textarea-bordered textarea-accent text-xl mb-4 w-full"
+        class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
         placeholder="Catatan"
         v-model="catatan"></textarea>
 
@@ -228,18 +195,18 @@ export default {
       rt: "",
       rw: "",
       catatan: "",
-      caleg: "",
+      caleg: "Pilih Caleg",
       calegList: [],
       event: "",
       evenList: [],
       catatan_kegiatan: "",
       kegiatan: [],
       kegiatanShow: [],
-      kelurahan: "",
-      kecamatan: "",
-      kota: "",
+      kelurahan: "Pilih Kelurahan",
+      kecamatan: "Pilih Kecamatan",
+      kota: "Pilih Kota",
       provinsi: "Pilih Provinsi",
-      kode_pos: "",
+      kode_pos: "Pilih Kode Pos",
       kelurahanList: [],
       kecamatanList: [],
       kotaList: [],
@@ -416,4 +383,10 @@ export default {
   },
 };
 </script>
-<style lang=""></style>
+<style scoped>
+>>> {
+  --vs-border-color: #1dcdbc;
+  --vs-border-radius: 6px;
+  --vs-font-size: 1rem;
+}
+</style>

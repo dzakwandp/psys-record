@@ -58,6 +58,10 @@ export default {
         this.items = data.data.data;
       } catch (err) {
         console.log(err);
+        if (err.response.status === 403){
+          useAuthStore().logout()
+          this.$router.push("/login")
+        }
       }
     },
   },
