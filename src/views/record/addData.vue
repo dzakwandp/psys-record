@@ -3,7 +3,9 @@
     <div class="flex w-full h-[10%] justify-center items-center bg-accent">
       <div class="text-base-100 text-4xl font-semibold">Tambah Data</div>
     </div>
-    <button class="btn btn-ghost text-neutral" @click="this.$router.push('/home')">
+    <button
+      class="btn btn-ghost text-neutral"
+      @click="this.$router.push('/home')">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -19,14 +21,20 @@
       Kembali
     </button>
     <div class="flex flex-col w-1/4 mx-auto mt-4">
-      <label class="text-base">NIK: </label>
+      <label class="flex text-base"
+        >NIK:
+        <div class="text-red-500">*</div>
+      </label>
       <input
         type="text"
         placeholder="Masukkan NIK"
         class="input input-bordered input-accent input-sm text-base mb-4"
         v-model="nik" />
 
-      <label class="text-base">Nama: </label>
+      <label class="flex text-base"
+        >Nama:
+        <div class="text-red-500">*</div>
+      </label>
       <input
         type="text"
         placeholder="Masukkan Nama"
@@ -34,7 +42,10 @@
         v-model="name" />
 
       <div class="flex flex-col mb-4">
-        <label class="text-base mb-2">Jenis Kelamin: </label>
+        <label class="flex text-base"
+          >Jenis Kelamin:
+          <div class="text-red-500">*</div>
+        </label>
         <div class="flex items-center mb-2">
           <input
             type="radio"
@@ -63,7 +74,10 @@
         class="input input-bordered input-accent input-sm text-base mb-4"
         v-model="hp" />
 
-      <label class="text-base">Provinsi: </label>
+      <label class="flex text-base"
+        >Provinsi:
+        <div class="text-red-500">*</div>
+      </label>
       <v-select
         v-model="provinsi"
         :options="provinsiList"
@@ -72,7 +86,10 @@
       </v-select>
 
       <div v-if="showKota">
-        <label class="text-base">Kota/ Kabupaten: </label>
+        <label class="flex text-base"
+          >Kota/ Kabupaten:
+          <div class="text-red-500">*</div>
+        </label>
         <v-select
           v-model="kota"
           :options="kotaList"
@@ -82,7 +99,10 @@
       </div>
 
       <div v-if="showKecamatan">
-        <label class="text-base">Kecamatan: </label>
+        <label class="flex text-base"
+          >Kecamatan:
+          <div class="text-red-500">*</div>
+        </label>
         <v-select
           v-model="kecamatan"
           :options="kecamatanList"
@@ -92,7 +112,10 @@
       </div>
 
       <div v-if="showKelurahan">
-        <label class="text-base">Kelurahan: </label>
+        <label class="flex text-base"
+          >Kelurahan:
+          <div class="text-red-500">*</div>
+        </label>
         <v-select
           v-model="kelurahan"
           :options="kelurahanList"
@@ -102,12 +125,18 @@
       </div>
 
       <div v-if="showPostalCode">
-        <label class="text-base">Kode Pos: </label>
+        <label class="flex text-base"
+          >Kode Pos:
+          <div class="text-red-500">*</div>
+        </label>
         <v-select v-model="kode_pos" :options="postalCodeFilter" label="code">
         </v-select>
       </div>
 
-      <label class="text-base">Alamat: </label>
+      <label class="flex text-base"
+        >Alamat:
+        <div class="text-red-500">*</div>
+      </label>
       <textarea
         class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
         placeholder="Masukkan alamat"
@@ -118,7 +147,7 @@
           <label class="text-base">RT: </label>
           <input
             type="text"
-            placeholder="RT"
+            placeholder="2 digit angka (01)"
             class="input input-bordered input-accent input-sm text-base mb-4"
             v-model="rt" />
         </div>
@@ -126,29 +155,29 @@
           <label class="text-base">RW: </label>
           <input
             type="text"
-            placeholder="RW"
+            placeholder="2 digit angka (01)"
             class="input input-bordered input-accent input-sm text-base mb-4"
             v-model="rw" />
         </div>
       </div>
 
-      <label class="text-base">Caleg: </label>
+      <label class="flex text-base"
+        >Caleg:
+        <div class="text-red-500">*</div>
+      </label>
       <v-select v-model="caleg" :options="calegList" label="name"> </v-select>
 
       <div class="flex flex-col outline outline-accent p-2 my-4">
         <label class="text-base">Kegiatan: </label>
-        <v-select
-          v-model="event"
-          :options="evenList"
-          label="name"
-          @update:modelValue="getCityData()">
-        </v-select>
+        <v-select v-model="event" :options="evenList" label="name"> </v-select>
         <label class="text-base">Catatan Kegiatan: </label>
         <textarea
           class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
           placeholder="Catatan Kegiatan"
           v-model="catatan_kegiatan"></textarea>
-        <button class="btn btn-accent btn-sm text-base-100" @click="tambahItem()">
+        <button
+          class="btn btn-accent btn-sm text-base-100"
+          @click="tambahItem()">
           Tambah
         </button>
         <table class="table">

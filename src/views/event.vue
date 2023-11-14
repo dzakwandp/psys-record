@@ -69,6 +69,10 @@ export default {
         this.items = event.data.data;
       } catch (err) {
         console.log(err);
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
+        }
       }
     },
     async addEvent() {

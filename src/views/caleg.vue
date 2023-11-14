@@ -28,7 +28,7 @@
             v-model="caleg" />
           <div class="modal-action">
             <!-- if there is a button in form, it will close the modal -->
-            <button class="btn btn-accent text-base-100" @click="addCalge()">
+            <button class="btn btn-accent text-base-100" @click="addCaleg()">
               Tambah
             </button>
           </div>
@@ -66,9 +66,13 @@ export default {
         this.items = caleg.data;
       } catch (err) {
         console.log(err);
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
+        }
       }
     },
-    async addCalge() {
+    async addCaleg() {
       try {
         const add = await axios.post(
           useEnvStore().apiUrl + "caleg",
