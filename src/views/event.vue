@@ -35,7 +35,7 @@
         </div>
       </dialog>
     </div>
-    <EasyDataTable :headers="headers" :items="items" />
+    <EasyDataTable :headers="headers" :items="items" alternating/>
   </div>
 </template>
 <script>

@@ -8,6 +8,8 @@ import Event from "@/views/event.vue";
 import Caleg from "@/views/caleg.vue";
 
 import AddData from "@/views/record/addData.vue";
+import DetailData from "@/views/record/detailData.vue";
+import EditData from "@/views/record/editData.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +45,16 @@ const router = createRouter({
           path: "new",
           name: "addData",
           component: AddData,
+        },
+        {
+          path: "detail/:id",
+          name: "detailData",
+          component: DetailData,
+        },
+        {
+          path: "edit/:id",
+          name: "editData",
+          component: EditData,
         },
       ],
     },

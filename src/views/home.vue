@@ -17,13 +17,30 @@
         Tambah
       </button>
     </div>
-    <EasyDataTable :headers="headers" :items="items" />
+    <EasyDataTable
+      v-model:items-selected="itemsSelected"
+      :headers="headers"
+      :items="items"
+      @click-row="toDataDetail"
+      alternating>
+      <template #item-kegiatan="item">
+        <div v-for="keg in item.kegiatan" class="my-1">
+          <div class="badge badge-accent badge-outline">
+            {{ keg.kegiatan.name }}
+          </div>
+        </div>
+      </template>
+      <template #item-created_date="item">
+        {{ formattedDate(item.created_date) }}
+      </template>
+    </EasyDataTable>
   </div>
 </template>
 <script>
 import { useEnvStore } from "@/stores/envStore";
 import { useAuthStore } from "@/stores/authStore";
 
+import moment from "moment/min/moment-with-locales";
 import axios from "axios";
 export default {
   components: {
@@ -31,6 +48,7 @@ export default {
   },
   data() {
     return {
+      itemsSelected: null,
       name: null,
       country: null,
       headers: [
@@ -40,8 +58,9 @@ export default {
         { text: "NO. HANDPHONE", value: "hp" },
         { text: "ALAMAT", value: "alamat" },
         { text: "CALEG", value: "caleg" },
-        { text: "KEGIATAN", value: "kegiatan.catatan_kegiatan" },
+        { text: "KEGIATAN", value: "kegiatan" },
         { text: "DATA OLEH", value: "user" },
+        { text: "DATA DIBUAT", value: "created_date" },
       ],
       items: [],
     };
@@ -58,11 +77,20 @@ export default {
         this.items = data.data.data;
       } catch (err) {
         console.log(err);
-        if (err.response.status === 403){
-          useAuthStore().logout()
-          this.$router.push("/login")
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
         }
       }
+    },
+    toDataDetail(item) {
+      // console.log(item)
+      this.$router.push("/detail/" + item.id);
+    },
+    formattedDate(value) {
+      const date = moment(value).subtract(7, "hours");
+      moment.locale("id");
+      return moment(date).format("D MMMM YYYY");
     },
   },
   mounted() {
