@@ -28,8 +28,14 @@
       <input
         type="text"
         placeholder="Masukkan NIK"
-        class="input input-bordered input-accent input-sm text-base mb-4"
+        class="input input-bordered input-accent input-sm text-base"
         v-model="nik" />
+      <span :class="nikVerifMessageClass">{{ nikVerifMessage }}</span>
+      <button
+        class="btn btn-accent btn-sm text-base-100 mb-4 mt-2"
+        @click="verifNik()">
+        Check NIK
+      </button>
 
       <label class="flex text-base"
         >Nama:
@@ -246,6 +252,8 @@ export default {
       showKelurahan: false,
       showPostalCode: false,
       postalCodeFilter: {},
+      nikVerifMessage: "",
+      nikVerifMessageClass: "",
     };
   },
   methods: {
@@ -397,6 +405,26 @@ export default {
         this.$router.push("/home");
       } catch (err) {
         console.log(err);
+      }
+    },
+    async verifNik() {
+      try {
+        const verif = await axios.post(
+          useEnvStore().apiUrl + "nik",
+          {
+            nik: this.nik,
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + useAuthStore().accessToken,
+            },
+          }
+        );
+        this.nikVerifMessage = verif.data.message;
+        this.nikVerifMessageClass = "text-accent";
+      } catch (err) {
+        this.nikVerifMessage = err.response.data.message;
+        this.nikVerifMessageClass = "text-error";
       }
     },
   },
