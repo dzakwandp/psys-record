@@ -148,22 +148,24 @@
         placeholder="Masukkan alamat"
         v-model="alamat"></textarea>
 
-      <div class="flex justify-between">
+      <div class="flex justify-between mb-4">
         <div class="flex flex-col w-2/5">
           <label class="text-base">RT: </label>
           <input
             type="text"
             placeholder="2 digit angka (01)"
-            class="input input-bordered input-accent input-sm text-base mb-4"
+            class="input input-bordered input-accent input-sm text-base mb-1"
             v-model="rt" />
+          <span class="text-error text-xs">Wajib diisi dengan 2 digit.</span>
         </div>
         <div class="flex flex-col w-2/5">
           <label class="text-base">RW: </label>
           <input
             type="text"
             placeholder="2 digit angka (01)"
-            class="input input-bordered input-accent input-sm text-base mb-4"
+            class="input input-bordered input-accent input-sm text-base mb-1"
             v-model="rw" />
+          <span class="text-error text-xs">Wajib diisi dengan 2 digit.</span>
         </div>
       </div>
 
