@@ -30,7 +30,7 @@
     <EasyDataTable
       v-model:items-selected="itemsSelected"
       :headers="headers"
-      :items="items"
+      :items="reversedData"
       :search-field="searchField"
       :search-value="searchValue"
       @click-row="toDataDetail"
@@ -56,6 +56,7 @@
 <script>
 import { useEnvStore } from "@/stores/envStore";
 import { useAuthStore } from "@/stores/authStore";
+// import { FilterOption } from "vue3-easy-data-table";
 
 import moment from "moment/min/moment-with-locales";
 import axios from "axios";
@@ -74,6 +75,10 @@ export default {
         "nik",
         "hp",
         "alamat",
+        "kelurahan",
+        "kecamatan",
+        "kota",
+        "provinsi",
         "caleg",
         "kegiatan",
         "user",
@@ -135,6 +140,11 @@ export default {
         data.kodePos;
       return alamat;
       console.log(alamat);
+    },
+  },
+  computed: {
+    reversedData() {
+      return this.items.slice().reverse();
     },
   },
   mounted() {

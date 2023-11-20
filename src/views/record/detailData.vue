@@ -81,14 +81,18 @@
               <td>Data Dibuat</td>
               <td>: {{ formattedDate(data.created_date) }}</td>
             </tr>
+            <tr>
+              <td>Catatan</td>
+              <td>: {{ data.catatan }}</td>
+            </tr>
           </tbody>
         </table>
         <div class="flex w-full justify-center gap-20 mt-4">
-          <button
+          <!-- <button
             class="btn btn-outline btn-warning w-20"
             @click="confirmAction('edit')">
             Edit
-          </button>
+          </button> -->
           <button
             class="btn btn-outline btn-error w-20"
             @click="confirmAction('hapus')">

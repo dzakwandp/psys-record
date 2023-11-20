@@ -21,12 +21,16 @@
       Kembali
     </button>
     <div class="flex flex-col w-1/4 mx-auto mt-4">
+      <div class="flex gap-1 mb-4">
+        <div class="text-red-500">*</div>
+        <div class="italic">) Wajib diisi.</div>
+      </div>
       <label class="flex text-base"
         >NIK:
         <div class="text-red-500">*</div>
       </label>
       <input
-        type="text"
+        type="number"
         placeholder="Masukkan NIK"
         class="input input-bordered input-accent input-sm text-base"
         v-model="nik" />
@@ -177,13 +181,19 @@
 
       <div class="flex flex-col outline outline-accent p-2 my-4">
         <label class="text-base">Kegiatan: </label>
-        <v-select v-model="event" :options="evenList" label="name"> </v-select>
+        <v-select
+          v-model="event"
+          :options="eventList"
+          @update:modelValue="showAddKegiatanButton = true"
+          label="name">
+        </v-select>
         <label class="text-base">Catatan Kegiatan: </label>
         <textarea
           class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
           placeholder="Catatan Kegiatan"
           v-model="catatan_kegiatan"></textarea>
         <button
+          v-if="showAddKegiatanButton"
           class="btn btn-accent btn-sm text-base-100"
           @click="tambahItem()">
           Tambah
@@ -199,6 +209,11 @@
             <tr v-for="items in kegiatanShow" :key="items.index">
               <td>{{ items.kegiatan_name }}</td>
               <td>{{ items.catatan_kegiatan }}</td>
+              <td>
+                <button class="text-error" @click="hapusItem(items.index)">
+                  <deleteIcon />
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -220,8 +235,10 @@
 import { useAuthStore } from "@/stores/authStore";
 import { useEnvStore } from "@/stores/envStore";
 
+import deleteIcon from "@/components/icons/delete_icon.vue";
 import axios from "axios";
 export default {
+  components: { deleteIcon },
   data() {
     return {
       name: "",
@@ -235,10 +252,11 @@ export default {
       caleg: "Pilih Caleg",
       calegList: [],
       event: "",
-      evenList: [],
+      eventList: [],
       catatan_kegiatan: "",
       kegiatan: [],
       kegiatanShow: [],
+      showAddKegiatanButton: false,
       kelurahan: "Pilih Kelurahan",
       kecamatan: "Pilih Kecamatan",
       kota: "Pilih Kota",
@@ -347,8 +365,8 @@ export default {
           },
         })
         .then((res) => {
-          this.evenList = res.data.data;
-          console.log(this.evenList);
+          this.eventList = res.data.data;
+          console.log(this.eventList);
         })
         .catch((err) => {
           console.log(err);
@@ -376,6 +394,20 @@ export default {
       });
       this.kegiatan = kegiatan;
       console.log(this.kegiatan);
+      console.log(Object.keys(this.kegiatanShow));
+    },
+    hapusItem(index) {
+      const indexToRemove = index;
+      const removedIndex = this.kegiatanShow.filter(
+        (obj) => obj.index !== indexToRemove
+      );
+      this.kegiatanShow = removedIndex;
+      console.log(Object.keys(this.kegiatanShow));
+      if (Object.keys(this.kegiatanShow).length !== 0) {
+        this.showAddKegiatanButton = true;
+      } else {
+        this.showAddKegiatanButton = false;
+      }
     },
     async submitData() {
       try {
@@ -384,7 +416,7 @@ export default {
           {
             name: this.name,
             kelamin: this.kelamin,
-            nik: this.nik,
+            nik: String(this.nik),
             hp: this.hp,
             provinsi: this.provinsi.name,
             kota: this.kota.name,
@@ -407,26 +439,40 @@ export default {
         this.$router.push("/home");
       } catch (err) {
         console.log(err);
+        if (err.response.status === 400) {
+          this.$swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "Periksa kembali form Anda, pastikan kolom wajib terisi sudah diisi.",
+          });
+        }
       }
     },
     async verifNik() {
-      try {
-        const verif = await axios.post(
-          useEnvStore().apiUrl + "nik",
-          {
-            nik: this.nik,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + useAuthStore().accessToken,
+      if (String(this.nik).length === 16) {
+        try {
+          const verif = await axios.post(
+            useEnvStore().apiUrl + "nik",
+            {
+              nik: String(this.nik),
             },
-          }
-        );
-        this.nikVerifMessage = verif.data.message;
-        this.nikVerifMessageClass = "text-accent";
-      } catch (err) {
-        this.nikVerifMessage = err.response.data.message;
-        this.nikVerifMessageClass = "text-error";
+            {
+              headers: {
+                Authorization: "Bearer " + useAuthStore().accessToken,
+              },
+            }
+          );
+          this.nikVerifMessage = verif.data.message;
+          this.nikVerifMessageClass = "text-accent";
+        } catch (err) {
+          this.nikVerifMessage = err.response.data.message;
+          this.nikVerifMessageClass = "text-error";
+        }
+      } else {
+        this.$swal.fire({
+          icon: "error",
+          title: "NIK harus terdiri dari 16 digit.",
+        });
       }
     },
   },

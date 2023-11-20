@@ -37,7 +37,7 @@
         <div
           class="flex w-full bg-accent h-[80px] items-center justify-center mb-10">
           <div class="text-base-100 font-semibold text-xl">
-            PSYS RECORD SYSTEM
+            Simpatisan Yoyok Sukawi
           </div>
         </div>
 
@@ -79,8 +79,8 @@ export default {
     return {
       email: useAuthStore().email,
       route: [
-        { name: "Home", path: "/home", icon: "home_icon" },
-        { name: "Event", path: "/event", icon: "event_icon" },
+        { name: "Bank Data", path: "/home", icon: "home_icon" },
+        { name: "Kegiatan", path: "/event", icon: "event_icon" },
         { name: "Caleg", path: "/caleg", icon: "person_icon" },
       ],
     };
