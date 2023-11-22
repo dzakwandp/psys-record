@@ -261,7 +261,7 @@ export default {
       kecamatan: "Pilih Kecamatan",
       kota: "Pilih Kota",
       provinsi: "Pilih Provinsi",
-      kode_pos: "Pilih Kode Pos",
+      kode_pos: null,
       kelurahanList: [],
       kecamatanList: [],
       kotaList: [],
