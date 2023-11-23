@@ -6,6 +6,7 @@ import Dashboard from "@/layout/dashboard.vue";
 import Home from "@/views/home.vue";
 import Event from "@/views/event.vue";
 import Caleg from "@/views/caleg.vue";
+import Statistik from "@/views/statistik.vue";
 
 import AddData from "@/views/record/addData.vue";
 import DetailData from "@/views/record/detailData.vue";
@@ -55,6 +56,11 @@ const router = createRouter({
           path: "edit/:id",
           name: "editData",
           component: EditData,
+        },
+        {
+          path: "statistik",
+          name: "statistik",
+          component: Statistik,
         },
       ],
     },

@@ -1,6 +1,7 @@
 <template lang="">
   <div class="w-full h-full p-4">
-    <div class="flex w-full h-[10%] items-center justify-between">
+    <div class="flex w-full h-[7%] items-center justify-between">
+      <!-- search bar -->
       <div class="flex gap-2 items-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +15,6 @@
             stroke-linejoin="round"
             d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
-
         <input
           type="text"
           placeholder="Search here"
@@ -27,6 +27,26 @@
         Tambah
       </button>
     </div>
+
+    <!-- filter section -->
+    <div class="flex w-full h-[7%] items-center justify-between">
+      <div class="flex w-1/10">
+        <v-select
+          v-model="user"
+          :options="userList"
+          @update:modelValue="filterByUser(user)">
+        </v-select>
+      </div>
+      <div class="flex w-1/10">
+        <download-excel :data="items">
+          <button class="text-accent">
+            <DocumentIcon></DocumentIcon>
+          </button>
+        </download-excel>
+      </div>
+    </div>
+
+    <!-- table section -->
     <EasyDataTable
       v-model:items-selected="itemsSelected"
       :headers="headers"
@@ -57,12 +77,14 @@
 import { useEnvStore } from "@/stores/envStore";
 import { useAuthStore } from "@/stores/authStore";
 // import { FilterOption } from "vue3-easy-data-table";
+import DocumentIcon from "@/components/icons/document_icon.vue";
 
 import moment from "moment/min/moment-with-locales";
 import axios from "axios";
 export default {
   components: {
     EasyDataTable: window["vue3-easy-data-table"],
+    DocumentIcon,
   },
   data() {
     return {
@@ -95,7 +117,10 @@ export default {
         { text: "DATA OLEH", value: "user" },
         { text: "DATA DIBUAT", value: "created_date" },
       ],
+      user: "Filter by User",
+      userList: ["Vita", "Anisa", "Chika", "Amanda", "Fara", "Ririk", "Ulfi"],
       items: [],
+      defaultItems: [],
     };
   },
   methods: {
@@ -108,6 +133,7 @@ export default {
         });
         console.log(data);
         this.items = data.data.data;
+        this.defaultItems = data.data.data;
       } catch (err) {
         console.log(err);
         if (err.response.status === 403) {
@@ -116,14 +142,26 @@ export default {
         }
       }
     },
+    filterByUser(value) {
+      if (value === null) {
+        this.items = this.defaultItems;
+        this.user = "Filter by User";
+      } else {
+        const filterArray = this.defaultItems.filter(
+          (obj) => obj.user === value.toLowerCase()
+        );
+        this.items = filterArray;
+        console.log(this.items);
+      }
+    },
     toDataDetail(item) {
       // console.log(item)
       this.$router.push("/detail/" + item.id);
     },
     formattedDate(value) {
-      const date = moment(value).subtract(7, "hours");
+      // const date = moment(value).subtract(7, "hours");
       moment.locale("id");
-      return moment(date).format("D MMMM YYYY");
+      return moment(value).format("D MMMM YYYY");
     },
     mergedAlamat(data) {
       const alamat =
@@ -144,7 +182,11 @@ export default {
   },
   computed: {
     reversedData() {
-      return this.items.slice().reverse();
+      return this.items.sort(function (a, b) {
+        // Turn your strings into dates, and then subtract them
+        // to get a value that is either negative, positive, or zero.
+        return new Date(b.created_date) - new Date(a.created_date);
+      });
     },
   },
   mounted() {
@@ -152,4 +194,9 @@ export default {
   },
 };
 </script>
-<style lang=""></style>
+<style scoped>
+>>> {
+  --vs-border-color: #1dcdbc;
+  --vs-border-radius: 6px;
+}
+</style>

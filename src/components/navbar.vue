@@ -45,10 +45,10 @@
         <div class="flex justify-center items-center">
           <div class="avatar placeholder">
             <div class="bg-accent-focus text-neutral-content rounded-full w-12">
-              <span>{{getAvatar}}</span>
+              <span>{{ getAvatar }}</span>
             </div>
           </div>
-          <div class="ml-2">Hello! {{email}}</div>
+          <div class="ml-2">Hello! {{ email }}</div>
         </div>
         <div v-for="items in route" :key="items.index">
           <li class="hover:bg-base-100 my-2">
@@ -73,8 +73,9 @@ import { useAuthStore } from "@/stores/authStore";
 import home_icon from "@/components/icons/home_icon.vue";
 import event_icon from "@/components/icons/event_icon.vue";
 import person_icon from "@/components/icons/person_icon.vue";
+import statistic_icon from "@/components/icons/statistic_icon.vue";
 export default {
-  components: { home_icon, event_icon, person_icon },
+  components: { home_icon, event_icon, person_icon, statistic_icon },
   data() {
     return {
       email: useAuthStore().email,
@@ -82,6 +83,7 @@ export default {
         { name: "Bank Data", path: "/home", icon: "home_icon" },
         { name: "Kegiatan", path: "/event", icon: "event_icon" },
         { name: "Caleg", path: "/caleg", icon: "person_icon" },
+        { name: "Statistik", path: "/statistik", icon: "statistic_icon" },
       ],
     };
   },
@@ -90,16 +92,16 @@ export default {
       document.getElementById("my-drawer").click();
     },
     logout() {
-      useAuthStore().logout()
+      useAuthStore().logout();
       this.$router.push("/login");
     },
   },
   computed: {
-    getAvatar(){
+    getAvatar() {
       const firstLetter = this.email.charAt(0);
       const secondLetter = this.email.charAt(1);
-      return firstLetter.toUpperCase()+secondLetter.toUpperCase()
-    }
+      return firstLetter.toUpperCase() + secondLetter.toUpperCase();
+    },
   },
 };
 </script>

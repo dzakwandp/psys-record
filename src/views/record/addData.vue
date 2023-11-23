@@ -1,5 +1,8 @@
 <template lang="">
-  <div class="w-full h-full">
+  <div v-if="loading" class="flex w-full h-full items-center justify-center">
+    <span class="loading loading-dots w-[5rem] text-accent"></span>
+  </div>
+  <div v-else class="w-full h-full">
     <div class="flex w-full h-[10%] justify-center items-center bg-accent">
       <div class="text-base-100 text-4xl font-semibold">Tambah Data</div>
     </div>
@@ -241,6 +244,7 @@ export default {
   components: { deleteIcon },
   data() {
     return {
+      loading: true,
       name: "",
       kelamin: "",
       nik: "",
@@ -352,9 +356,14 @@ export default {
         })
         .then((res) => {
           this.calegList = res.data;
+          this.loading = false;
         })
         .catch((err) => {
           console.log(err);
+          if (err.response.status === 403) {
+            useAuthStore().logout();
+            this.$router.push("/login");
+          }
         });
     },
     getEvent() {

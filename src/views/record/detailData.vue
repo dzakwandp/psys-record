@@ -193,9 +193,9 @@ export default {
       }
     },
     formattedDate(value) {
-      const date = moment(value).subtract(7, "hours");
+      // const date = moment(value).subtract(7, "hours");
       moment.locale("id");
-      return moment(date).format("D MMMM YYYY [Jam] HH:mm");
+      return moment(value).format("D MMMM YYYY [Jam] HH:mm");
     },
   },
   mounted() {

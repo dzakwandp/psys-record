@@ -17,6 +17,8 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import Vue3EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 
+import JsonExcel from "vue-json-excel3";
+
 const app = createApp(App);
 
 app.use(createPinia().use(piniaPluginPersistedState));
@@ -24,5 +26,6 @@ app.use(router);
 app.use(VueSweetAlert2);
 app.component("EasyDataTable", Vue3EasyDataTable);
 app.component("v-select", vSelect);
+app.component("downloadExcel", JsonExcel);
 
 app.mount("#app");
