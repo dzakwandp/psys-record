@@ -30,6 +30,23 @@
 
     <!-- filter section -->
     <div class="flex w-full h-[7%] items-center justify-between">
+      <!-- filter by provinsi -->
+      <div class="flex w-1/10">
+        <v-select
+          v-model="prov"
+          :options="provList"
+          @update:modelValue="filterByProv(prov)">
+        </v-select>
+      </div>
+      <!-- filter by caleg -->
+      <div class="flex w-1/10">
+        <v-select
+          v-model="caleg"
+          :options="calegList"
+          @update:modelValue="filterByCaleg(caleg)">
+        </v-select>
+      </div>
+      <!-- filter by user -->
       <div class="flex w-1/10">
         <v-select
           v-model="user"
@@ -37,6 +54,15 @@
           @update:modelValue="filterByUser(user)">
         </v-select>
       </div>
+      <!-- reset filter -->
+      <div class="flex w-1/10">
+        <button
+          class="btn btn-outline btn-accent btn-sm"
+          @click="resetFilter()">
+          Reset Filter
+        </button>
+      </div>
+      <!-- export button -->
       <div class="flex w-1/10">
         <download-excel :data="items">
           <button class="text-accent">
@@ -51,6 +77,8 @@
       v-model:items-selected="itemsSelected"
       :headers="headers"
       :items="reversedData"
+      :loading="loading"
+      :theme-color="theme"
       :search-field="searchField"
       :search-value="searchValue"
       @click-row="toDataDetail"
@@ -88,6 +116,8 @@ export default {
   },
   data() {
     return {
+      loading: true,
+      theme: "#37cdbe",
       itemsSelected: null,
       name: null,
       country: null,
@@ -117,8 +147,12 @@ export default {
         { text: "DATA OLEH", value: "user" },
         { text: "DATA DIBUAT", value: "created_date" },
       ],
+      prov: "Filter by Provinsi",
+      provList: [],
       user: "Filter by User",
       userList: ["Vita", "Anisa", "Chika", "Amanda", "Fara", "Ririk", "Ulfi"],
+      caleg: "Filter by Caleg",
+      calegList: [],
       items: [],
       defaultItems: [],
     };
@@ -131,9 +165,10 @@ export default {
             Authorization: "Bearer " + useAuthStore().accessToken,
           },
         });
-        console.log(data);
         this.items = data.data.data;
         this.defaultItems = data.data.data;
+        this.getList();
+        this.loading = false;
       } catch (err) {
         console.log(err);
         if (err.response.status === 403) {
@@ -142,16 +177,50 @@ export default {
         }
       }
     },
+    async getCaleg() {
+      try {
+        const data = await axios.get(useEnvStore().apiUrl + "caleg", {
+          headers: {
+            Authorization: "Bearer " + useAuthStore().accessToken,
+          },
+        });
+        console.log(data);
+        const dataCaleg = data.data;
+        this.calegList = dataCaleg.map((item) => item.name);
+        console.log(this.calegList);
+      } catch (err) {
+        console.log(err);
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
+        }
+      }
+    },
+    getList() {
+      this.provList = [...new Set(this.items.map((item) => item.provinsi))].sort()
+      console.log(this.provList);
+    },
+    resetFilter() {
+      this.items = this.defaultItems;
+      this.user = "Filter by User";
+      this.caleg = "Filter by Caleg";
+    },
     filterByUser(value) {
       if (value === null) {
-        this.items = this.defaultItems;
         this.user = "Filter by User";
       } else {
-        const filterArray = this.defaultItems.filter(
+        var filterArray = this.items.filter(
           (obj) => obj.user === value.toLowerCase()
         );
         this.items = filterArray;
-        console.log(this.items);
+      }
+    },
+    filterByCaleg(value) {
+      if (value === null) {
+        this.caleg = "Filter by Caleg";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.caleg === value);
+        this.items = filterArray;
       }
     },
     toDataDetail(item) {
@@ -191,6 +260,7 @@ export default {
   },
   mounted() {
     this.getData();
+    this.getCaleg();
   },
 };
 </script>
@@ -198,5 +268,6 @@ export default {
 >>> {
   --vs-border-color: #1dcdbc;
   --vs-border-radius: 6px;
+  --vs-dropdown-min-width: 330px;
 }
 </style>

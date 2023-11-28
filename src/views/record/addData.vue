@@ -285,7 +285,10 @@ export default {
       axios
         .get(useEnvStore().addressUrl + "provinces.json")
         .then((res) => {
-          this.provinsiList = res.data;
+          this.provinsiList = res.data.filter(
+            (item) => item.name === "JAWA TENGAH"
+          );
+          console.log(this.provinsiList);
         })
         .catch((err) => {
           console.log(err);
@@ -297,7 +300,15 @@ export default {
           useEnvStore().addressUrl + "regencies/" + this.provinsi.id + ".json"
         )
         .then((res) => {
-          this.kotaList = res.data;
+          const desiredCity = [
+            "KOTA SEMARANG",
+            "KABUPATEN SEMARANG",
+            "KOTA SALATIGA",
+            "KABUPATEN KENDAL",
+          ];
+          this.kotaList = res.data.filter((item) =>
+            desiredCity.includes(item.name)
+          );
           this.showKota = true;
           console.log(res);
         })
@@ -334,13 +345,14 @@ export default {
       axios
         .get(
           "https://kodepos.vercel.app/search/?q=" +
-            this.kecamatan.name +
+            this.kelurahan.name +
             "+" +
             strKab
         )
         .then((res) => {
           this.postalCodeList = res.data.data;
           console.log(this.postalCodeList);
+          this.kode_pos = this.postalCodeList[0].code;
           this.showPostalCode = true;
         })
         .catch((err) => {
