@@ -245,11 +245,11 @@ export default {
   data() {
     return {
       loading: true,
-      name: "",
+      name: null,
       kelamin: "",
       nik: "",
       hp: "",
-      alamat: "",
+      alamat: null,
       rt: "00",
       rw: "00",
       catatan: "",
