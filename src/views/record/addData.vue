@@ -275,7 +275,6 @@ export default {
       showKecamatan: false,
       showKelurahan: false,
       showPostalCode: false,
-      postalCodeFilter: {},
       nikVerifMessage: "",
       nikVerifMessageClass: "",
     };

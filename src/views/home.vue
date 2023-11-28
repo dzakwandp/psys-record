@@ -29,46 +29,111 @@
     </div>
 
     <!-- filter section -->
-    <div class="flex w-full h-[7%] items-center justify-between">
-      <!-- filter by provinsi -->
-      <div class="flex w-1/10">
-        <v-select
-          v-model="prov"
-          :options="provList"
-          @update:modelValue="filterByProv(prov)">
-        </v-select>
+    <div class="flex-col w-full">
+      <!-- first row -->
+      <div class="flex w-full h-[7%] items-center justify-between mb-4">
+        <!-- filter by provinsi -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="prov"
+            :options="provList"
+            @update:modelValue="filterByProv(prov)">
+          </v-select>
+        </div>
+        <!-- filter by kota -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="kota"
+            :options="kotaList"
+            @update:modelValue="filterByKota(kota)">
+          </v-select>
+        </div>
+        <!-- filter by kecamatan -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="kecamatan"
+            :options="kecamatanList"
+            @update:modelValue="filterByKecamatan(kecamatan)">
+          </v-select>
+        </div>
+        <!-- filter by kelurahan -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="kelurahan"
+            :options="kelurahanList"
+            @update:modelValue="filterByKelurahan(kelurahan)">
+          </v-select>
+        </div>
+        <!-- filter by kodepos -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="kodepos"
+            :options="kodeposList"
+            @update:modelValue="filterByKodePos(kodepos)">
+          </v-select>
+        </div>
+        <!-- filter by RW -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="rw"
+            :options="rwList"
+            @update:modelValue="filterByKodeRW(rw)">
+          </v-select>
+        </div>
+        <!-- filter by RT -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="rt"
+            :options="rtList"
+            @update:modelValue="filterByKodeRT(rt)">
+          </v-select>
+        </div>
       </div>
-      <!-- filter by caleg -->
-      <div class="flex w-1/10">
-        <v-select
-          v-model="caleg"
-          :options="calegList"
-          @update:modelValue="filterByCaleg(caleg)">
-        </v-select>
+      <!-- second row -->
+      <div class="flex w-full h-[7%] items-center justify-center mb-4 gap-10">
+        <!-- filter by JK -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="jk"
+            :options="jkList"
+            @update:modelValue="filterByJK(jk)">
+          </v-select>
+        </div>
+        <!-- filter by caleg -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="caleg"
+            :options="calegList"
+            @update:modelValue="filterByCaleg(caleg)">
+          </v-select>
+        </div>
+        <!-- filter by user -->
+        <div class="flex w-1/10">
+          <v-select
+            v-model="user"
+            :options="userList"
+            @update:modelValue="filterByUser(user)">
+          </v-select>
+        </div>
       </div>
-      <!-- filter by user -->
-      <div class="flex w-1/10">
-        <v-select
-          v-model="user"
-          :options="userList"
-          @update:modelValue="filterByUser(user)">
-        </v-select>
-      </div>
-      <!-- reset filter -->
-      <div class="flex w-1/10">
-        <button
-          class="btn btn-outline btn-accent btn-sm"
-          @click="resetFilter()">
-          Reset Filter
-        </button>
-      </div>
-      <!-- export button -->
-      <div class="flex w-1/10">
-        <download-excel :data="items">
-          <button class="text-accent">
-            <DocumentIcon></DocumentIcon>
+      <!-- third row -->
+      <div class="flex w-full h-[7%] items-center justify-center mb-4 gap-2">
+        <!-- reset filter -->
+        <div class="flex w-1/10">
+          <button
+            class="btn btn-outline btn-accent btn-sm"
+            @click="resetFilter()">
+            Reset Filter
           </button>
-        </download-excel>
+        </div>
+        <!-- export button -->
+        <div class="flex w-1/10">
+          <download-excel :data="items">
+            <button class="text-accent align-middle" title="Export to .xls">
+              <DocumentIcon></DocumentIcon>
+            </button>
+          </download-excel>
+        </div>
       </div>
     </div>
 
@@ -147,11 +212,25 @@ export default {
         { text: "DATA OLEH", value: "user" },
         { text: "DATA DIBUAT", value: "created_date" },
       ],
-      prov: "Filter by Provinsi",
+      prov: "Filter Provinsi",
       provList: [],
-      user: "Filter by User",
+      kota: "Filter Kota/Kab",
+      kotaList: [],
+      kecamatan: "Filter Kecamatan",
+      kecamatanList: [],
+      kelurahan: "Filter Kelurahan",
+      kelurahanList: [],
+      kodepos: "Filter Kode Pos",
+      kodeposList: [],
+      rt: "Filter Kode Pos",
+      rtList: [],
+      rw: "Filter Kode Pos",
+      rwList: [],
+      user: "Filter User",
       userList: ["Vita", "Anisa", "Chika", "Amanda", "Fara", "Ririk", "Ulfi"],
-      caleg: "Filter by Caleg",
+      jk: "Filter Jenis Kelamin",
+      jkList: ["LakiLaki", "Perempuan"],
+      caleg: "Filter Caleg",
       calegList: [],
       items: [],
       defaultItems: [],
@@ -167,7 +246,8 @@ export default {
         });
         this.items = data.data.data;
         this.defaultItems = data.data.data;
-        this.getList();
+        this.getProvList();
+        this.getCaleg();
         this.loading = false;
       } catch (err) {
         console.log(err);
@@ -177,37 +257,111 @@ export default {
         }
       }
     },
-    async getCaleg() {
-      try {
-        const data = await axios.get(useEnvStore().apiUrl + "caleg", {
-          headers: {
-            Authorization: "Bearer " + useAuthStore().accessToken,
-          },
-        });
-        console.log(data);
-        const dataCaleg = data.data;
-        this.calegList = dataCaleg.map((item) => item.name);
-        console.log(this.calegList);
-      } catch (err) {
-        console.log(err);
-        if (err.response.status === 403) {
-          useAuthStore().logout();
-          this.$router.push("/login");
-        }
-      }
-    },
-    getList() {
-      this.provList = [...new Set(this.items.map((item) => item.provinsi))].sort()
+    getProvList() {
+      this.provList = [
+        ...new Set(this.items.map((item) => item.provinsi)),
+      ].sort();
       console.log(this.provList);
+    },
+    getCaleg() {
+      this.calegList = [
+        ...new Set(this.items.map((item) => item.caleg)),
+      ].sort();
     },
     resetFilter() {
       this.items = this.defaultItems;
-      this.user = "Filter by User";
-      this.caleg = "Filter by Caleg";
+      this.provinsi = "Filter Provinsi";
+      this.kota = "Filter Kota/Kab";
+      this.kecamatan = "Filter Kecamatan";
+      this.kelurahan = "Filter Kelurahan";
+      this.kodepos = "Filter Kode Pos";
+      this.rt = "Filter RT";
+      this.rw = "Filter RW";
+      this.jk = "Filter Jenis Kelamin";
+      this.user = "Filter User";
+      this.caleg = "Filter Caleg";
+    },
+    filterByProv(value) {
+      if (value === null) {
+        this.prov = "Filter Prov";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.provinsi === value);
+        this.items = filterArray;
+        this.kotaList = [
+          ...new Set(this.items.map((item) => item.kota)),
+        ].sort();
+      }
+    },
+    filterByKota(value) {
+      if (value === null) {
+        this.kota = "Filter Kota/Kab";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.kota === value);
+        this.items = filterArray;
+        this.kecamatanList = [
+          ...new Set(this.items.map((item) => item.kecamatan)),
+        ].sort();
+      }
+    },
+    filterByKecamatan(value) {
+      if (value === null) {
+        this.kecamatan = "Filter Kecamatan";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.kecamatan === value);
+        this.items = filterArray;
+        this.kelurahanList = [
+          ...new Set(this.items.map((item) => item.kelurahan)),
+        ].sort();
+      }
+    },
+    filterByKelurahan(value) {
+      if (value === null) {
+        this.kelurahan = "Filter Kelurahan";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.kelurahan === value);
+        this.items = filterArray;
+        this.kodeposList = [
+          ...new Set(this.items.map((item) => item.kodePos)),
+        ].sort();
+        this.rtList = [...new Set(this.items.map((item) => item.rt))].sort();
+        this.rwList = [...new Set(this.items.map((item) => item.rw))].sort();
+      }
+    },
+    filterByKodePos(value) {
+      if (value === null) {
+        this.kodepos = "Filter Kode Pos";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.kodePos === value);
+        this.items = filterArray;
+      }
+    },
+    filterByKodeRW(value) {
+      if (value === null) {
+        this.rw = "Filter RW";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.rw === value);
+        this.items = filterArray;
+      }
+    },
+    filterByKodeRT(value) {
+      if (value === null) {
+        this.rt = "Filter RT";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.rt === value);
+        this.items = filterArray;
+      }
+    },
+    filterByJK(value) {
+      if (value === null) {
+        this.jk = "Filter Jenis Kelamin";
+      } else {
+        var filterArray = this.items.filter((obj) => obj.kelamin === value);
+        this.items = filterArray;
+      }
     },
     filterByUser(value) {
       if (value === null) {
-        this.user = "Filter by User";
+        this.user = "Filter User";
       } else {
         var filterArray = this.items.filter(
           (obj) => obj.user === value.toLowerCase()
@@ -217,7 +371,7 @@ export default {
     },
     filterByCaleg(value) {
       if (value === null) {
-        this.caleg = "Filter by Caleg";
+        this.caleg = "Filter Caleg";
       } else {
         var filterArray = this.items.filter((obj) => obj.caleg === value);
         this.items = filterArray;
@@ -260,7 +414,6 @@ export default {
   },
   mounted() {
     this.getData();
-    this.getCaleg();
   },
 };
 </script>
