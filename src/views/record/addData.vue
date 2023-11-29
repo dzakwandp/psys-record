@@ -466,6 +466,10 @@ export default {
             text: "Periksa kembali form Anda, pastikan kolom wajib terisi sudah diisi.",
           });
         }
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
+        }
       }
     },
     async verifNik() {
