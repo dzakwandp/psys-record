@@ -88,11 +88,11 @@
           </tbody>
         </table>
         <div class="flex w-full justify-center gap-20 mt-4">
-          <!-- <button
+          <button
             class="btn btn-outline btn-warning w-20"
             @click="confirmAction('edit')">
             Edit
-          </button> -->
+          </button>
           <button
             class="btn btn-outline btn-error w-20"
             @click="confirmAction('hapus')">
@@ -142,6 +142,10 @@ export default {
         this.data = detail.data.data;
       } catch (err) {
         console.log(err);
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
+        }
       }
     },
     confirmAction(value) {

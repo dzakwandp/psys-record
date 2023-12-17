@@ -1,7 +1,10 @@
 <template lang="">
-  <div class="w-full h-full">
+  <div v-if="loading" class="flex w-full h-full items-center justify-center">
+    <span class="loading loading-dots w-[5rem] text-accent"></span>
+  </div>
+  <div v-else class="w-full h-full">
     <div class="flex w-full h-[10%] justify-center items-center bg-accent">
-      <div class="text-base-100 text-4xl font-semibold">Ubah Data</div>
+      <div class="text-base-100 text-4xl font-semibold">Edit Data</div>
     </div>
     <button
       class="btn btn-ghost text-neutral"
@@ -21,14 +24,18 @@
       Kembali
     </button>
     <div class="flex flex-col w-1/4 mx-auto mt-4">
+      <div class="flex gap-1 mb-4">
+        <div class="text-red-500">*</div>
+        <div class="italic">) Wajib diisi.</div>
+      </div>
       <label class="flex text-base"
         >NIK:
         <div class="text-red-500">*</div>
       </label>
       <input
-        type="text"
-        placeholder="Masukkan NIK"
-        class="input input-bordered input-accent input-sm text-base mb-4"
+        type="number"
+        disabled
+        class="input input-bordered input-accent input-sm text-base"
         v-model="nik" />
 
       <label class="flex text-base"
@@ -129,7 +136,10 @@
           >Kode Pos:
           <div class="text-red-500">*</div>
         </label>
-        <v-select v-model="kode_pos" :options="postalCodeFilter" label="code">
+        <v-select
+          v-model="kode_pos"
+          :options="postalCodeList"
+          label="postal_code">
         </v-select>
       </div>
 
@@ -142,22 +152,24 @@
         placeholder="Masukkan alamat"
         v-model="alamat"></textarea>
 
-      <div class="flex justify-between">
+      <div class="flex justify-between mb-4">
         <div class="flex flex-col w-2/5">
           <label class="text-base">RT: </label>
           <input
             type="text"
             placeholder="2 digit angka (01)"
-            class="input input-bordered input-accent input-sm text-base mb-4"
+            class="input input-bordered input-accent input-sm text-base mb-1"
             v-model="rt" />
+          <span class="text-error text-xs">Wajib diisi dengan 2 digit.</span>
         </div>
         <div class="flex flex-col w-2/5">
           <label class="text-base">RW: </label>
           <input
             type="text"
             placeholder="2 digit angka (01)"
-            class="input input-bordered input-accent input-sm text-base mb-4"
+            class="input input-bordered input-accent input-sm text-base mb-1"
             v-model="rw" />
+          <span class="text-error text-xs">Wajib diisi dengan 2 digit.</span>
         </div>
       </div>
 
@@ -168,18 +180,24 @@
       <v-select v-model="caleg" :options="calegList" label="name"> </v-select>
 
       <div class="flex flex-col outline outline-accent p-2 my-4">
-        <label class="text-base">Kegiatan: </label>
-        <v-select v-model="event" :options="evenList" label="name"> </v-select>
+        <!-- <label class="text-base">Kegiatan: </label>
+        <v-select
+          v-model="event"
+          :options="eventList"
+          @update:modelValue="showAddKegiatanButton = true"
+          label="name">
+        </v-select>
         <label class="text-base">Catatan Kegiatan: </label>
         <textarea
           class="textarea textarea-bordered textarea-accent text-base mb-4 w-full"
           placeholder="Catatan Kegiatan"
-          v-model="catatan_kegiatan"></textarea>
-        <button
+          v-model="catatan_kegiatan"></textarea> -->
+        <!-- <button
+          v-if="showAddKegiatanButton"
           class="btn btn-accent btn-sm text-base-100"
           @click="tambahItem()">
           Tambah
-        </button>
+        </button> -->
         <table class="table">
           <thead>
             <tr>
@@ -191,10 +209,19 @@
             <tr v-for="items in kegiatanShow" :key="items.index">
               <td>{{ items.kegiatan_name }}</td>
               <td>{{ items.catatan_kegiatan }}</td>
+              <td>
+                <button class="text-warning" @click="editCatatanKegiatan(items)">
+                  <editIcon />
+                </button>
+                <!-- <button class="text-error" @click="hapusItem(items.index)">
+                  <deleteIcon />
+                </button> -->
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
+      <editModal ref="editModal" />
 
       <label class="text-base">Catatan: </label>
       <textarea
@@ -202,20 +229,9 @@
         placeholder="Catatan"
         v-model="catatan"></textarea>
 
-      <div>
-        <button
-          v-if="showSubmitNoEditedAddress"
-          class="btn btn-block btn-neutral text-base-100 mb-4"
-          @click="submitData()">
-          Kirim Data
-        </button>
-        <button
-          v-else
-          class="btn btn-block btn-neutral text-base-100 mb-4"
-          @click="submitEditedAddressData()">
-          Kirim Data
-        </button>
-      </div>
+      <button class="btn btn-neutral text-base-100 mb-4" @click="submitData()">
+        Update Data
+      </button>
     </div>
   </div>
 </template>
@@ -223,40 +239,45 @@
 import { useAuthStore } from "@/stores/authStore";
 import { useEnvStore } from "@/stores/envStore";
 
+import editModal from "@/components/editKegiatan.vue";
+import deleteIcon from "@/components/icons/delete_icon.vue";
+import editIcon from "@/components/icons/edit_icon.vue";
 import axios from "axios";
 export default {
+  components: { deleteIcon, editIcon, editModal },
   data() {
     return {
-      name: "",
+      loading: true,
+      name: null,
       kelamin: "",
       nik: "",
       hp: "",
-      alamat: "",
+      alamat: null,
       rt: "00",
       rw: "00",
       catatan: "",
       caleg: "Pilih Caleg",
       calegList: [],
       event: "",
-      evenList: [],
+      eventList: [],
       catatan_kegiatan: "",
       kegiatan: [],
       kegiatanShow: [],
+      showAddKegiatanButton: false,
       kelurahan: "Pilih Kelurahan",
+      kelurahanId: null,
       kecamatan: "Pilih Kecamatan",
+      kecamatanId: null,
       kota: "Pilih Kota",
+      kotaId: null,
       provinsi: "Pilih Provinsi",
-      kode_pos: "Pilih Kode Pos",
+      provinsiId: null,
+      kode_pos: null,
       kelurahanList: [],
       kecamatanList: [],
       kotaList: [],
       provinsiList: [],
       postalCodeList: [],
-      showKota: false,
-      showKecamatan: false,
-      showKelurahan: false,
-      showPostalCode: false,
-      showSubmitNoEditedAddress: true,
     };
   },
   methods: {
@@ -264,21 +285,33 @@ export default {
       axios
         .get(useEnvStore().addressUrl + "provinces.json")
         .then((res) => {
-          this.provinsiList = res.data;
+          this.provinsiList = res.data.filter(
+            (item) => item.name === "JAWA TENGAH"
+          );
+          console.log(this.provinsiList);
         })
         .catch((err) => {
           console.log(err);
         });
     },
     getCityData() {
+      this.provinsiId = this.provinsi.id;
+      this.provinsi = this.provinsi.name;
       axios
         .get(
-          useEnvStore().addressUrl + "regencies/" + this.provinsi.id + ".json"
+          useEnvStore().addressUrl + "regencies/" + this.provinsiId + ".json"
         )
         .then((res) => {
-          this.kota = "";
-          this.kotaList = res.data;
-          this.showSubmitNoEditedAddress = false;
+          const desiredCity = [
+            "KOTA SEMARANG",
+            "KABUPATEN SEMARANG",
+            "KOTA SALATIGA",
+            "KABUPATEN KENDAL",
+          ];
+          this.kotaList = res.data.filter((item) =>
+            desiredCity.includes(item.name)
+          );
+          this.showKota = true;
           console.log(res);
         })
         .catch((err) => {
@@ -286,42 +319,54 @@ export default {
         });
     },
     getDistrictData() {
+      this.kotaId = this.kota.id;
+      this.kota = this.kota.name;
       axios
-        .get(useEnvStore().addressUrl + "districts/" + this.kota.id + ".json")
+        .get(useEnvStore().addressUrl + "districts/" + this.kotaId + ".json")
         .then((res) => {
-          this.kecamatan = "";
           this.kecamatanList = res.data;
+          this.showKecamatan = true;
         })
         .catch((err) => {
           console.log(err);
         });
     },
     getVillageData() {
+      this.kecamatanId = this.kecamatan.id;
+      this.kecamatan = this.kecamatan.name;
       axios
         .get(
-          useEnvStore().addressUrl + "villages/" + this.kecamatan.id + ".json"
+          useEnvStore().addressUrl + "villages/" + this.kecamatanId + ".json"
         )
         .then((res) => {
-          this.kelurahan = "";
           this.kelurahanList = res.data;
+          this.showKelurahan = true;
         })
         .catch((err) => {
           console.log(err);
         });
     },
     getPostalCodeData() {
-      const strKab = this.kota.name.substr(this.kota.name.indexOf(" ") + 1);
+      this.kelurahanId = this.kelurahan.id;
+      this.kelurahan = this.kelurahan.name;
+      const strKab = this.kota.substr(this.kota.indexOf(" ") + 1);
       axios
         .get(
-          "https://kodepos.vercel.app/search/?q=" +
-            this.kecamatan.name +
-            "+" +
+          "http://178.16.143.152:3005/kodepos/" +
+            this.provinsiId +
+            "?" +
+            "q=" +
+            this.kelurahan +
+            "-" +
+            this.kecamatan +
+            "-" +
             strKab
         )
         .then((res) => {
-          this.kode_pos = "";
-          this.postalCodeList = res.data.data;
+          this.postalCodeList = new Array(res.data.data);
           console.log(this.postalCodeList);
+          this.kode_pos = this.postalCodeList[0].postal_code;
+          this.showPostalCode = true;
         })
         .catch((err) => {
           console.log(err);
@@ -336,9 +381,14 @@ export default {
         })
         .then((res) => {
           this.calegList = res.data;
+          this.loading = false;
         })
         .catch((err) => {
           console.log(err);
+          if (err.response.status === 403) {
+            useAuthStore().logout();
+            this.$router.push("/login");
+          }
         });
     },
     getEvent() {
@@ -349,12 +399,49 @@ export default {
           },
         })
         .then((res) => {
-          this.evenList = res.data.data;
-          console.log(this.evenList);
+          this.eventList = res.data.data;
+          console.log(this.eventList);
         })
         .catch((err) => {
           console.log(err);
         });
+    },
+    async getData() {
+      try {
+        const getData = await axios.get(
+          useEnvStore().apiUrl + "post/" + this.$route.params.id,
+          {
+            headers: {
+              Authorization: "Bearer " + useAuthStore().accessToken,
+            },
+          }
+        );
+        console.log(getData);
+        this.nik = getData.data.data.nik;
+        this.name = getData.data.data.name;
+        this.kelamin = getData.data.data.kelamin;
+        this.hp = getData.data.data.hp;
+        this.provinsi = getData.data.data.provinsi;
+        this.kota = getData.data.data.kota;
+        this.kecamatan = getData.data.data.kecamatan;
+        this.kelurahan = getData.data.data.kelurahan;
+        this.kode_pos = getData.data.data.kodePos;
+        this.alamat = getData.data.data.alamat;
+        this.rt = getData.data.data.rt;
+        this.rw = getData.data.data.rw;
+        this.caleg = getData.data.data.caleg;
+        this.catatan = getData.data.data.catatan;
+        this.kegiatanShow = getData.data.data.kegiatan.map((item) => ({
+          id: item.id,
+          post_id: item.post_id,
+          kegiatan_id: item.kegiatan_id,
+          kegiatan_name: item.kegiatan.name,
+          catatan_kegiatan: item.catatan_kegiatan,
+        }));
+        console.log(this.kegiatanShow);
+      } catch (err) {
+        console.log(err);
+      }
     },
     tambahItem() {
       const itemBaru = {
@@ -378,52 +465,43 @@ export default {
       });
       this.kegiatan = kegiatan;
       console.log(this.kegiatan);
+      console.log(Object.keys(this.kegiatanShow));
+    },
+    hapusItem(index) {
+      const indexToRemove = index;
+      const removedIndex = this.kegiatanShow.filter(
+        (obj) => obj.index !== indexToRemove
+      );
+      this.kegiatanShow = removedIndex;
+      console.log(Object.keys(this.kegiatanShow));
+      if (Object.keys(this.kegiatanShow).length !== 0) {
+        this.showAddKegiatanButton = true;
+      } else {
+        this.showAddKegiatanButton = false;
+      }
+    },
+    editCatatanKegiatan(item) {
+      this.$refs.editModal.openModal(item);
     },
     async submitData() {
+      this.kegiatan = this.kegiatanShow.map((item) => ({
+        id: item.id,
+        post_id: item.post_id,
+        kegiatan_id: item.kegiatan_id,
+        catatan_kegiatan: item.catatan_kegiatan,
+      }));
       try {
         const submit = await axios.put(
           useEnvStore().apiUrl + "post/" + this.$route.params.id,
           {
             name: this.name,
             kelamin: this.kelamin,
-            nik: this.nik,
+            nik: String(this.nik),
             hp: this.hp,
             provinsi: this.provinsi,
             kota: this.kota,
             kecamatan: this.kecamatan,
             kelurahan: this.kelurahan,
-            kodePos: this.kode_pos,
-            alamat: this.alamat,
-            rt: this.rt,
-            rw: this.rw,
-            caleg: this.caleg,
-            kegiatan: this.kegiatan,
-            catatan: this.catatan,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + useAuthStore().accessToken,
-            },
-          }
-        );
-        this.$router.push("/home");
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    async submitEditedAddressData() {
-      try {
-        const submit = await axios.put(
-          useEnvStore().apiUrl + "post/" + this.$route.params.id,
-          {
-            name: this.name,
-            kelamin: this.kelamin,
-            nik: this.nik,
-            hp: this.hp,
-            provinsi: this.provinsi.name,
-            kota: this.kota.name,
-            kecamatan: this.kecamatan.name,
-            kelurahan: this.kelurahan.name,
             kodePos: this.kode_pos,
             alamat: this.alamat,
             rt: this.rt,
@@ -438,47 +516,22 @@ export default {
             },
           }
         );
+        console.log(submit);
         this.$router.push("/home");
       } catch (err) {
         console.log(err);
+        if (err.response.status === 400) {
+          this.$swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "Periksa kembali form Anda, pastikan kolom wajib terisi sudah diisi.",
+          });
+        }
+        if (err.response.status === 403) {
+          useAuthStore().logout();
+          this.$router.push("/login");
+        }
       }
-    },
-    async getData() {
-      try {
-        const data = await axios.get(
-          useEnvStore().apiUrl + "post/" + this.$route.params.id,
-          {
-            headers: {
-              Authorization: "Bearer " + useAuthStore().accessToken,
-            },
-          }
-        );
-        console.log(data);
-        this.name = data.data.data.name;
-        this.kelamin = data.data.data.kelamin;
-        this.nik = data.data.data.nik;
-        this.hp = data.data.data.hp;
-        this.provinsi = data.data.data.provinsi;
-        this.kota = data.data.data.kota;
-        this.kecamatan = data.data.data.kecamatan;
-        this.kelurahan = data.data.data.kelurahan;
-        this.kode_pos = data.data.data.kodePos;
-        this.alamat = data.data.data.alamat;
-        this.rt = data.data.data.rt;
-        this.rw = data.data.data.rw;
-        this.caleg = data.data.data.caleg;
-        this.kegiatan = data.data.data.kegiatan;
-        this.kegiatanShow = data.data.data.kegiatan;
-        this.kegiatanShow.kegiatan_name = data.data.data.kegiatan.name;
-        this.catatan = data.data.data.catatan;
-      } catch (err) {
-        console.log(err);
-      }
-    },
-  },
-  computed: {
-    postalCodeFilter() {
-      return [...new Set(this.postalCodeList.map((i) => i.postalcode))].sort();
     },
   },
   mounted() {

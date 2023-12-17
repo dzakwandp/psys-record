@@ -142,7 +142,7 @@
           >Kode Pos:
           <div class="text-red-500">*</div>
         </label>
-        <v-select v-model="kode_pos" :options="postalCodeFilter" label="code">
+        <v-select v-model="kode_pos" :options="postalCodeList" label="postal_code">
         </v-select>
       </div>
 
@@ -343,15 +343,20 @@ export default {
       const strKab = this.kota.name.substr(this.kota.name.indexOf(" ") + 1);
       axios
         .get(
-          "https://kodepos.vercel.app/search/?q=" +
+          "http://178.16.143.152:3005/kodepos/" +
+            this.provinsi.id +
+            "?" +
+            "q=" +
             this.kelurahan.name +
-            "+" +
+            "-" +
+            this.kecamatan.name +
+            "-" +
             strKab
         )
         .then((res) => {
-          this.postalCodeList = res.data.data;
+          this.postalCodeList = new Array(res.data.data);
           console.log(this.postalCodeList);
-          this.kode_pos = this.postalCodeList[0].code;
+          this.kode_pos = this.postalCodeList[0].postal_code;
           this.showPostalCode = true;
         })
         .catch((err) => {
@@ -500,11 +505,11 @@ export default {
       }
     },
   },
-  computed: {
-    postalCodeFilter() {
-      return [...new Set(this.postalCodeList.map((i) => i.postalcode))].sort();
-    },
-  },
+  // computed: {
+  //   postalCodeFilter() {
+  //     return [...new Set(this.postalCodeList.map((i) => i.postalcode))].sort();
+  //   },
+  // },
   mounted() {
     this.getProvinceData();
     this.getCaleg();
