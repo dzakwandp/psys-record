@@ -10,27 +10,31 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6 text-accent">
+            class="w-6 h-6 text-accent"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
           </svg>
           <input
             type="text"
             placeholder="Search here"
             class="input input-bordered input-sm input-accent w-full max-w-xs"
-            v-model="searchValue" />
+            v-model="searchValue"
+          />
         </div>
         <!-- show/hide filter button -->
         <button
           class="btn btn-accent btn-outline btn-sm"
-          @click="showFilter = !showFilter">
+          @click="showFilter = !showFilter"
+        >
           <p v-if="showFilter">Sembunyikan Filter</p>
           <p v-else>Tampilkan Filter</p>
         </button>
         <!-- export button -->
-        <download-excel :data="items">
+        <download-excel :fields="export_fields" :data="items">
           <button class="text-accent align-middle" title="Export to .xls">
             <DocumentIcon></DocumentIcon>
           </button>
@@ -40,7 +44,8 @@
       <div class="flex w-1/2 justify-end">
         <button
           class="btn btn-outline btn-sm btn-accent"
-          @click="this.$router.push('/new')">
+          @click="this.$router.push('/new')"
+        >
           Tambah
         </button>
       </div>
@@ -55,7 +60,8 @@
           <v-select
             v-model="prov"
             :options="provList"
-            @update:modelValue="filterByProv(prov)">
+            @update:modelValue="filterByProv(prov)"
+          >
           </v-select>
         </div>
         <!-- filter by kota -->
@@ -63,7 +69,8 @@
           <v-select
             v-model="kota"
             :options="kotaList"
-            @update:modelValue="filterByKota(kota)">
+            @update:modelValue="filterByKota(kota)"
+          >
           </v-select>
         </div>
         <!-- filter by kecamatan -->
@@ -71,7 +78,8 @@
           <v-select
             v-model="kecamatan"
             :options="kecamatanList"
-            @update:modelValue="filterByKecamatan(kecamatan)">
+            @update:modelValue="filterByKecamatan(kecamatan)"
+          >
           </v-select>
         </div>
         <!-- filter by kelurahan -->
@@ -79,7 +87,8 @@
           <v-select
             v-model="kelurahan"
             :options="kelurahanList"
-            @update:modelValue="filterByKelurahan(kelurahan)">
+            @update:modelValue="filterByKelurahan(kelurahan)"
+          >
           </v-select>
         </div>
         <!-- filter by kodepos -->
@@ -87,7 +96,8 @@
           <v-select
             v-model="kodepos"
             :options="kodeposList"
-            @update:modelValue="filterByKodePos(kodepos)">
+            @update:modelValue="filterByKodePos(kodepos)"
+          >
           </v-select>
         </div>
         <!-- filter by RW -->
@@ -95,7 +105,8 @@
           <v-select
             v-model="rw"
             :options="rwList"
-            @update:modelValue="filterByKodeRW(rw)">
+            @update:modelValue="filterByKodeRW(rw)"
+          >
           </v-select>
         </div>
         <!-- filter by RT -->
@@ -103,7 +114,8 @@
           <v-select
             v-model="rt"
             :options="rtList"
-            @update:modelValue="filterByKodeRT(rt)">
+            @update:modelValue="filterByKodeRT(rt)"
+          >
           </v-select>
         </div>
       </div>
@@ -114,7 +126,8 @@
           <v-select
             v-model="jk"
             :options="jkList"
-            @update:modelValue="filterByJK(jk)">
+            @update:modelValue="filterByJK(jk)"
+          >
           </v-select>
         </div>
         <!-- filter by caleg -->
@@ -122,7 +135,8 @@
           <v-select
             v-model="caleg"
             :options="calegList"
-            @update:modelValue="filterByCaleg(caleg)">
+            @update:modelValue="filterByCaleg(caleg)"
+          >
           </v-select>
         </div>
         <!-- filter by user -->
@@ -130,7 +144,8 @@
           <v-select
             v-model="user"
             :options="userList"
-            @update:modelValue="filterByUser(user)">
+            @update:modelValue="filterByUser(user)"
+          >
           </v-select>
         </div>
       </div>
@@ -140,7 +155,8 @@
         <div class="flex w-1/10">
           <button
             class="btn btn-outline btn-accent btn-sm"
-            @click="resetFilter()">
+            @click="resetFilter()"
+          >
             Reset Filter
           </button>
         </div>
@@ -157,7 +173,8 @@
       :search-field="searchField"
       :search-value="searchValue"
       @click-row="toDataDetail"
-      alternating>
+      alternating
+    >
       <template #item-alamat="item">
         <div>
           {{ mergedAlamat(item) }}
@@ -245,6 +262,26 @@ export default {
       calegList: [],
       items: [],
       defaultItems: [],
+      export_fields: {
+        Nama: "name",
+        "Jenis Kelamin": "kelamin",
+        NIK: "nik",
+        HP: "hp",
+        Provinsi: "provinsi",
+        "Kabupaten/ Kota": "kota",
+        Kecamatan: "kecamatan",
+        Kelurahan: "kelurahan",
+        Alamat: "alamat",
+        "Kode Pos": "kodePos",
+        Caleg: "caleg",
+        Kegiatan: {
+          field: "kegiatan",
+          callback: (value) => {
+            return value.map(a=> a.kegiatan.name)
+          },
+        },
+        Data_Oleh: "user",
+      },
     };
   },
   methods: {
