@@ -273,6 +273,8 @@ export default {
         Kelurahan: "kelurahan",
         Alamat: "alamat",
         "Kode Pos": "kodePos",
+        RT: "rt",
+        RW: "rw",
         Caleg: "caleg",
         Kegiatan: {
           field: "kegiatan",
