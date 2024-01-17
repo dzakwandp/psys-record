@@ -274,7 +274,7 @@ export default {
         HP: {
           field: "hp",
           callback: (value) => {
-            return value.toString();
+            return "'"+value;
           },
         },
         Provinsi: "provinsi",
