@@ -265,8 +265,18 @@ export default {
       export_fields: {
         Nama: "name",
         "Jenis Kelamin": "kelamin",
-        NIK: "nik",
-        HP: "hp",
+        NIK: {
+          field: "nik",
+          callback: (value) => {
+            return value.toString();
+          },
+        },
+        HP: {
+          field: "hp",
+          callback: (value) => {
+            return value.toString();
+          },
+        },
         Provinsi: "provinsi",
         "Kabupaten/ Kota": "kota",
         Kecamatan: "kecamatan",
@@ -279,10 +289,11 @@ export default {
         Kegiatan: {
           field: "kegiatan",
           callback: (value) => {
-            return value.map(a=> a.kegiatan.name)
+            return value.map((a) => a.kegiatan.name);
           },
         },
-        Data_Oleh: "user",
+        data_oleh: "user",
+        created_at: "created_date"
       },
     };
   },
