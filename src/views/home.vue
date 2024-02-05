@@ -34,7 +34,7 @@
           <p v-else>Tampilkan Filter</p>
         </button>
         <!-- export button -->
-        <download-excel :fields="export_fields" :data="items">
+        <download-excel :fields="export_fields" :data="items" type="xls">
           <button class="text-accent align-middle" title="Export to .xls">
             <DocumentIcon></DocumentIcon>
           </button>
@@ -274,7 +274,7 @@ export default {
         HP: {
           field: "hp",
           callback: (value) => {
-            return "'"+value;
+            return value.toString();
           },
         },
         Provinsi: "provinsi",
@@ -293,7 +293,7 @@ export default {
           },
         },
         data_oleh: "user",
-        created_at: "created_date"
+        created_at: "created_date",
       },
     };
   },
